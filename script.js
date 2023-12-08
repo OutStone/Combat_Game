@@ -3,7 +3,7 @@ const ctx = canvas.getContext('2d');
 
 const Meters2pixel = 20
 function draw() {
-    ctx.clearRect(0, 0, 420, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     Hostile_NPC.forEach(mob => {
         ctx.beginPath();
@@ -33,8 +33,8 @@ function spawn_enemy(x, y) {
 }
 
 Hostile_NPC = []
-spawn_enemy(10, 4)
-P1 = new player(15, 16)
+spawn_enemy(5, 5)
+P1 = new player(15, 4)
 
 console.log(Hostile_NPC[0].angle)
 
@@ -47,10 +47,16 @@ function gameLoop() {
     });
     i++
     draw()
-    if (i < 1000) {
+    if (i < 500) {
         window.requestAnimationFrame(gameLoop);
-    }
+    } else {alert('end')}
 }
+
+window.addEventListener('keydown', key => {
+    if (key.key == "w") {
+        P1.y -= 3
+    }
+});
 
 window.requestAnimationFrame(gameLoop);
 console.log(Hostile_NPC)
