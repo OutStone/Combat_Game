@@ -1,7 +1,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
-const Meters2pixel = 20
 
+const Meters2pixel = 20
 function draw() {
     ctx.clearRect(0, 0, 420, canvas.height);
 
@@ -31,17 +31,26 @@ function stop() {
 function spawn_enemy(x, y) {
     Hostile_NPC.push(new enemy(x, y))
 }
+
 Hostile_NPC = []
-spawn_enemy(10, 0)
+spawn_enemy(10, 4)
 P1 = new player(15, 16)
-while (true) {
+
+console.log(Hostile_NPC[0].angle)
+
+var i = 0
+
+function gameLoop() {
     Hostile_NPC.forEach(mob => {
         mob.look()
+        mob.move()
     });
-
+    i++
     draw()
-
-    if (stop()) {
-        break;
+    if (i < 1000) {
+        window.requestAnimationFrame(gameLoop);
     }
 }
+
+window.requestAnimationFrame(gameLoop);
+console.log(Hostile_NPC)
