@@ -33,10 +33,10 @@ function spawn_enemy(x, y) {
 }
 
 Hostile_NPC = []
-spawn_enemy(5, 5)
-P1 = new player(15, 4)
+spawn_enemy(5, 15)
+P1 = new player(5, 5)
 
-console.log(Hostile_NPC[0].angle)
+console.log(Hostile_NPC[0].angle/Math.PI)
 
 var i = 0
 
@@ -59,4 +59,3 @@ window.addEventListener('keydown', key => {
 });
 
 window.requestAnimationFrame(gameLoop);
-console.log(Hostile_NPC)
