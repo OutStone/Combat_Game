@@ -5,6 +5,7 @@ class player{
     constructor(start_x, start_y){
         this.x = start_x
         this.y = start_y
+        this.movement = ""
         this.angle = Math.PI/4 //in radeans
 
         this.radius = 1 //in meters
@@ -46,6 +47,7 @@ class enemy{
 
             switch (isNaN(angle)) {
                 case true:
+                    console.log("si NaN")
                     if (P1.y < this.y) {
                         angle = 0.5 * Math.PI
                     } else {
@@ -55,6 +57,7 @@ class enemy{
                 case false:
                     switch (angle) {
                         case 0:
+                            console.log("si null")
                             if (P1.x < this.x) {
                                 angle = Math.PI
                             } else {
@@ -122,12 +125,11 @@ class enemy{
                 const delta = [P1.x - this.x, P1.y - this.y]
                 if (Math.sqrt(delta[0]**2 + delta[1]**2) > P1.radius + this.radius + fight_distance) {//it keeps automatily some distance from player
                     const distance = speed * (delta_time / 1000)
-                    const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance * Math.sign(delta[1])]
+                    const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance * Math.sign(delta[1])] //TODO: this sign is the reason for the condition on next line
                     if (P1.y < this.y) {
                         //change_in_position[0] = -change_in_position[0];
                         change_in_position[1] = -change_in_position[1];
                     }
-                    console.log(change_in_position)
                     this.x += change_in_position[0]
                     this.y += change_in_position[1]
                 }
