@@ -49,32 +49,52 @@ var last_time = new Date()
 function gameLoop() {
     
     const now_time = new Date();
-    const delta_time = now_time.getTime() - last_time.getTime();
-    last_time = new Date()
+    const delta_time = (now_time.getTime() - last_time.getTime()) / 1000;
+    last_time = new Date();
     Hostile_NPC.forEach(mob => {
         mob.look()
         mob.move()
     });
 
-    switch (P1.movement) {
+    switch (P1.movement.direction) {
         case "w":
-            const distance = speed * (delta_time / 1000)
-            const change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
+            var gain_velocity = P1.movement.acceleration * delta_time
+
+            if (P1.movement.max_speed[0] - P1.movement.speed >= gain_velocity) {
+                var distance = P1.movement.speed * delta_time + gain_velocity * delta_time / 0.5
+            } else {
+                gain_velocity = P1.movement.max_speed[0] - P1.movement.speed
+                var distance = P1.movement.speed * delta_time + gain_velocity * delta_time / 0.5
+            }
+            P1.movement.speed += gain_velocity
+            console.log(P1.movement.speed)
+            
+            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
             P1.x += change_in_position[0]
             P1.y += change_in_position[1]
             
             break;
         case "s":
-            const distance1 = speed * (delta_time / 1000)
-            const change_in_position1 = [Math.cos(P1.angle) * distance1, Math.sin(P1.angle) * distance1]
-            P1.x -= change_in_position1[0]
-            P1.y -= change_in_position1[1]
+            var gain_velocity = (-P1.movement.acceleration) * delta_time
+
+            if (-P1.movement.max_speed[0] - P1.movement.speed <= gain_velocity) {
+                var distance = P1.movement.speed * delta_time + gain_velocity * delta_time / 0.5
+            } else {
+                gain_velocity = - P1.movement.max_speed[0] - P1.movement.speed
+                var distance = P1.movement.speed * delta_time + gain_velocity * delta_time / 0.5
+            }
+            P1.movement.speed += gain_velocity
+            console.log(P1.movement.speed)
+            
+            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
+            P1.x += change_in_position[0]
+            P1.y += change_in_position[1]
             break;
         case "a":
-            P1.angle -= turning_speed * (delta_time / 1000)
+            P1.angle -= turning_speed * delta_time
             break;
         case "d":
-            P1.angle += turning_speed * (delta_time / 1000)
+            P1.angle += turning_speed * delta_time
             break;
     }
 
@@ -85,42 +105,48 @@ function gameLoop() {
 }
 
 window.addEventListener('keydown', key => {
+    console.log(key.key)
     switch (key.key) {
         case "Escape":
             stop_game = true;
             break;
         case "w":
-            P1.movement = "w"
+            if (P1.movement.direction == "w") {
+                P1.movement.direction = ""
+            } else {P1.movement.direction = "w"}
             break;
         case "s":
-            P1.movement = "s"
+            if (P1.movement.direction == "s") {
+                P1.movement.direction = ""
+            } else {P1.movement.direction = "s"}
             break;
         case "a":
-            P1.movement = "a"
+            if (P1.movement.direction == "a") {
+                P1.movement.direction = ""
+            } else {P1.movement.direction = "a"}
             break;
         case "d":
-            P1.movement = "d"
+            if (P1.movement.direction == "d") {
+                P1.movement.direction = ""
+            } else {P1.movement.direction = "d"}
             break;
     }
 });
-window.addEventListener('keyup', key => {
+/* window.addEventListener('keyup', key => {
     switch (key.key) {
-        case "Escape":
-            stop_game = true;
-            break;
         case "w":
-            P1.movement = ""
+            P1.movement.direction = ""
             break;
         case "s":
-            P1.movement = ""
+            P1.movement.direction = ""
             break;
         case "a":
-            P1.movement = ""
+            P1.movement.direction = ""
             break;
         case "d":
-            P1.movement = ""
+            P1.movement.direction = ""
             break;
     }
-});
+}); */
 
 window.requestAnimationFrame(gameLoop);
