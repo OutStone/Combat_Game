@@ -58,15 +58,15 @@ function gameLoop() {
 
     switch (P1.movement.direction) {
         case "w":
-            var gain_velocity = P1.movement.acceleration * delta_time
+            var gained_velocity = P1.movement.acceleration * delta_time
 
-            if (P1.movement.max_speed[0] - P1.movement.speed >= gain_velocity) {
-                var distance = P1.movement.speed * delta_time + gain_velocity * delta_time / 0.5
+            if (P1.movement.max_speed[0] - P1.movement.speed >= gained_velocity) {
+                var distance = P1.movement.speed * delta_time + gained_velocity * delta_time / 0.5
             } else {
-                gain_velocity = P1.movement.max_speed[0] - P1.movement.speed
-                var distance = P1.movement.speed * delta_time + gain_velocity * delta_time / 0.5
+                gained_velocity = P1.movement.max_speed[0] - P1.movement.speed
+                var distance = P1.movement.speed * delta_time + gained_velocity * delta_time / 0.5
             }
-            P1.movement.speed += gain_velocity
+            P1.movement.speed += gained_velocity
             console.log(P1.movement.speed)
             
             var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
@@ -75,15 +75,15 @@ function gameLoop() {
             
             break;
         case "s":
-            var gain_velocity = (-P1.movement.acceleration) * delta_time
+            var gained_velocity = (-P1.movement.acceleration) * delta_time
 
-            if (-P1.movement.max_speed[0] - P1.movement.speed <= gain_velocity) {
-                var distance = P1.movement.speed * delta_time + gain_velocity * delta_time / 0.5
+            if (-P1.movement.max_speed[0] - P1.movement.speed <= gained_velocity) {
+                var distance = P1.movement.speed * delta_time + gained_velocity * delta_time / 0.5
             } else {
-                gain_velocity = - P1.movement.max_speed[0] - P1.movement.speed
-                var distance = P1.movement.speed * delta_time + gain_velocity * delta_time / 0.5
+                gained_velocity = - P1.movement.max_speed[0] - P1.movement.speed
+                var distance = P1.movement.speed * delta_time + gained_velocity * delta_time / 0.5
             }
-            P1.movement.speed += gain_velocity
+            P1.movement.speed += gained_velocity
             console.log(P1.movement.speed)
             
             var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
@@ -96,6 +96,25 @@ function gameLoop() {
         case "d":
             P1.angle += turning_speed * delta_time
             break;
+        default: //if no key is pressed, that the player slows down
+            var lost_velocity = (P1.movement.deacceleration) * delta_time * Math.sign(P1.movement.speed)
+            
+            if (0 <= lost_velocity + P1.movement.speed) {
+                var distance = P1.movement.speed * delta_time + lost_velocity * delta_time / 0.5
+
+            } else if (Math.sign(P1.movement.speed) == -1 && 0 >= lost_velocity + P1.movement.speed) {
+                var distance = P1.movement.speed * delta_time + lost_velocity * delta_time / 0.5
+
+            } else {
+                lost_velocity = - P1.movement.speed
+                var distance = P1.movement.speed * delta_time + lost_velocity * delta_time / 0.5
+            }
+            P1.movement.speed += lost_velocity
+            console.log(P1.movement.speed)
+
+            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
+            P1.x += change_in_position[0]
+            P1.y += change_in_position[1]
     }
 
     draw();
