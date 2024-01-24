@@ -39,7 +39,7 @@ function spawn_enemy(x, y) {
 }
 
 Hostile_NPC = []
-spawn_enemy(5, 15)
+spawn_enemy(50, 115)
 P1 = new player(5, 5)
 
 
@@ -56,50 +56,65 @@ function gameLoop() {
         mob.move()
     });
 
+//-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-#-# PLAYER MOVEMENT
+
     switch (P1.movement.direction) {
         case "w":
-            var gained_velocity = P1.movement.acceleration * delta_time
+            if (P1.movement.speed < 0) { //deacceleration - it should be faster to break
+                var gained_velocity =  - P1.movement.deacceleration * delta_time
+                if (gained_velocity + P1.movement.speed > 0) {
+                    gained_velocity = -P1.movement.speed
+                }
+            } else {var gained_velocity = P1.movement.acceleration * delta_time} //normal acceleration
 
-            if (P1.movement.max_speed[0] - P1.movement.speed >= gained_velocity) {
+            if (P1.movement.max_speed[0] - P1.movement.speed >= gained_velocity) { //check if player didn't accelerationed over the max speed
                 var distance = P1.movement.speed * delta_time + gained_velocity * delta_time / 0.5
             } else {
                 gained_velocity = P1.movement.max_speed[0] - P1.movement.speed
                 var distance = P1.movement.speed * delta_time + gained_velocity * delta_time / 0.5
             }
             P1.movement.speed += gained_velocity
-            console.log(P1.movement.speed)
             
-            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
+            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance] //callulate the changes in position due to the movement
             P1.x += change_in_position[0]
             P1.y += change_in_position[1]
             
             break;
-        case "s":
-            var gained_velocity = (-P1.movement.acceleration) * delta_time
 
-            if (-P1.movement.max_speed[0] - P1.movement.speed <= gained_velocity) {
+        case "s":
+            if (P1.movement.speed < 0) { //deacceleration - it should be faster to break
+                var gained_velocity =  P1.movement.deacceleration* delta_time
+                if (gained_velocity + P1.movement.speed > 0) {
+                    gained_velocity = -P1.movement.speed
+                }
+            } else {var gained_velocity = -P1.movement.acceleration * forward_backward_speed_ratio  * delta_time} //normal acceleration
+            console.log(forward_backward_speed_ratio)
+
+            if (-P1.movement.max_speed[0]  * forward_backward_speed_ratio  - P1.movement.speed <= gained_velocity) { //check if player didn't accelerationed over the max speed
                 var distance = P1.movement.speed * delta_time + gained_velocity * delta_time / 0.5
             } else {
-                gained_velocity = - P1.movement.max_speed[0] - P1.movement.speed
+                gained_velocity = - P1.movement.max_speed[0] * forward_backward_speed_ratio  - P1.movement.speed
                 var distance = P1.movement.speed * delta_time + gained_velocity * delta_time / 0.5
             }
             P1.movement.speed += gained_velocity
-            console.log(P1.movement.speed)
             
-            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
+            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance] //callulate the changes in position due to the movement
             P1.x += change_in_position[0]
             P1.y += change_in_position[1]
             break;
+
         case "a":
             P1.angle -= turning_speed * delta_time
             break;
+
         case "d":
             P1.angle += turning_speed * delta_time
             break;
+
         default: //if no key is pressed, that the player slows down
             var lost_velocity = (P1.movement.deacceleration) * delta_time * Math.sign(P1.movement.speed)
             
-            if (0 <= lost_velocity + P1.movement.speed) {
+            if (0 <= lost_velocity + P1.movement.speed) { //check if player didn't break so much, that he is in reverse
                 var distance = P1.movement.speed * delta_time + lost_velocity * delta_time / 0.5
 
             } else if (Math.sign(P1.movement.speed) == -1 && 0 >= lost_velocity + P1.movement.speed) {
@@ -110,9 +125,8 @@ function gameLoop() {
                 var distance = P1.movement.speed * delta_time + lost_velocity * delta_time / 0.5
             }
             P1.movement.speed += lost_velocity
-            console.log(P1.movement.speed)
 
-            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance]
+            var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance] //callulate the changes in position due to the movement
             P1.x += change_in_position[0]
             P1.y += change_in_position[1]
     }
@@ -130,28 +144,20 @@ window.addEventListener('keydown', key => {
             stop_game = true;
             break;
         case "w":
-            if (P1.movement.direction == "w") {
-                P1.movement.direction = ""
-            } else {P1.movement.direction = "w"}
+            P1.movement.direction = "w"
             break;
         case "s":
-            if (P1.movement.direction == "s") {
-                P1.movement.direction = ""
-            } else {P1.movement.direction = "s"}
+            P1.movement.direction = "s"
             break;
         case "a":
-            if (P1.movement.direction == "a") {
-                P1.movement.direction = ""
-            } else {P1.movement.direction = "a"}
+            P1.movement.direction = "a"
             break;
         case "d":
-            if (P1.movement.direction == "d") {
-                P1.movement.direction = ""
-            } else {P1.movement.direction = "d"}
+            P1.movement.direction = "d"
             break;
     }
 });
-/* window.addEventListener('keyup', key => {
+window.addEventListener('keyup', key => {
     switch (key.key) {
         case "w":
             P1.movement.direction = ""
@@ -166,6 +172,6 @@ window.addEventListener('keydown', key => {
             P1.movement.direction = ""
             break;
     }
-}); */
+});
 
 window.requestAnimationFrame(gameLoop);

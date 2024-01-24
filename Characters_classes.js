@@ -1,6 +1,7 @@
-const turning_speed = Math.PI/5;
+const turning_speed = Math.PI/1.25;
 const speed = 5;
 const fight_distance = 1;
+const forward_backward_speed_ratio = 2/3
 
 class player {
     constructor(start_x, start_y){
@@ -25,7 +26,7 @@ class Movement {
         this.direction = "";
         this.max_speed = [50,10];
         this.acceleration = 25;
-        this.deacceleration = -45;
+        this.deacceleration = -90;
         this.speed = 0;
     
     }
@@ -128,6 +129,7 @@ class enemy {
         }
     }
     move() {
+        var moveThisTime = false
         const d = new Date();
         const delta_time =( d.getTime() - this.time.getTime()) / 1000;
         this.time = new Date()
@@ -158,18 +160,47 @@ class enemy {
                 }
             } else {//nearly facing player
                 //it can move towards him
+
                 const delta = [P1.x - this.x, P1.y - this.y]
                 if (Math.sqrt(delta[0]**2 + delta[1]**2) > P1.radius + this.radius + fight_distance) {//it keeps automatily some distance from player
-                    const distance = speed * delta_time
-                    const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance * Math.sign(delta[1])] //TODO: this sign is the reason for the condition on next line
-                    if (P1.y < this.y) {
-                        //change_in_position[0] = -change_in_position[0];
-                        change_in_position[1] = -change_in_position[1];
+                    moveThisTime = true
+
+                    var gained_velocity = this.movement.acceleration * delta_time
+                    
+                    if (gained_velocity > this.movement.max_speed[0] - this.movement.speed) {
+                        gained_velocity = this.movement.max_speed[0] - this.movement.speed
                     }
+            
+
+                    const distance = this.movement.speed * delta_time + (gained_velocity * delta_time)/2
+                    this.movement.speed += gained_velocity
+                    const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance/*  * Math.sign(delta[1]) */] //TODO: this sign is the reason for the condition on next line
+                    /* if (P1.y < this.y) {
+                        change_in_position[1] = -change_in_position[1];
+                    } */
                     this.x += change_in_position[0]
                     this.y += change_in_position[1]
+                    
                 }
             }
+        } else {
+            // here will be function to look around
+        } 
+        if (Math.abs(this.movement.speed) > 0 && moveThisTime == false) { //TODO: change the condition so it works for reverse too
+            console.log("breaking")
+            var lost_velocity = this.movement.deacceleration * delta_time
+            if (lost_velocity > this.movement.speed) {
+                lost_velocity = -this.movement.speed
+            }
+            
+            const distance = this.movement.speed * delta_time + (lost_velocity * delta_time)/2
+            this.movement.speed += lost_velocity
+            const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance/*  * Math.sign(delta[1]) */] //TODO: this sign is the reason for the condition on next line
+            /* if (P1.y < this.y) {
+                change_in_position[1] = -change_in_position[1];
+            } */
+            this.x += change_in_position[0]
+            this.y += change_in_position[1]
         }
 
     }
