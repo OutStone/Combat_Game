@@ -103,14 +103,6 @@ function gameLoop() {
             P1.y += change_in_position[1]
             break;
 
-        case "a":
-            P1.angle -= turning_speed * delta_time
-            break;
-
-        case "d":
-            P1.angle += turning_speed * delta_time
-            break;
-
         default: //if no key is pressed, that the player slows down
             var lost_velocity = (P1.movement.deacceleration) * delta_time * Math.sign(P1.movement.speed)
             
@@ -129,6 +121,16 @@ function gameLoop() {
             var change_in_position = [Math.cos(P1.angle) * distance, Math.sin(P1.angle) * distance] //callulate the changes in position due to the movement
             P1.x += change_in_position[0]
             P1.y += change_in_position[1]
+    }
+
+    switch (P1.movement.turning) {
+        case "a":
+            P1.angle -= turning_speed * delta_time
+            break;
+
+        case "d":
+            P1.angle += turning_speed * delta_time
+            break;
     }
 
     draw();
@@ -150,10 +152,10 @@ window.addEventListener('keydown', key => {
             P1.movement.direction = "s"
             break;
         case "a":
-            P1.movement.direction = "a"
+            P1.movement.turning = "a"
             break;
         case "d":
-            P1.movement.direction = "d"
+            P1.movement.turning = "d"
             break;
     }
 });
@@ -166,10 +168,10 @@ window.addEventListener('keyup', key => {
             P1.movement.direction = ""
             break;
         case "a":
-            P1.movement.direction = ""
+            P1.movement.turning = ""
             break;
         case "d":
-            P1.movement.direction = ""
+            P1.movement.turning = ""
             break;
     }
 });

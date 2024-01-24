@@ -24,6 +24,7 @@ class View {
 class Movement {
     constructor(){
         this.direction = "";
+        this.turning = "";
         this.max_speed = [50,10];
         this.acceleration = 25;
         this.deacceleration = -90;
