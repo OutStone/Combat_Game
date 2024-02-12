@@ -2,6 +2,7 @@ const turning_speed = Math.PI/1.25;
 const speed = 5;
 const fight_distance = 1;
 const forward_backward_speed_ratio = 2/3
+const Meters2pixel = 20
 
 class player {
     constructor(start_x, start_y){
@@ -15,6 +16,7 @@ class player {
     }
 }
 
+//#################################################################-------support classes------########################################
 class View {
     constructor(lenght, angle){ //in meters and radeans
         this.angle = angle;
@@ -26,7 +28,7 @@ class Movement {
         this.direction = "";
         this.turning = "";
         this.max_speed = [50,10];
-        this.acceleration = 25;
+        this.acceleration = 40;
         this.deacceleration = -90;
         this.speed = 0;
     
@@ -135,8 +137,10 @@ class enemy {
         const delta_time =( d.getTime() - this.time.getTime()) / 1000;
         this.time = new Date()
 
+        //* TURN part of enemy movement
         if (this.playerSee) {
             const delta_angle = this.playerAngle - this.angle
+            // am i not facing player?
             if ((delta_angle > 0.1 && delta_angle <= Math.PI) || delta_angle < -Math.PI) {
 
                 this.angle += turning_speed * delta_time
@@ -159,35 +163,39 @@ class enemy {
                     this.angle = this.playerAngle
                     
                 }
-            } else {//nearly facing player
-                //it can move towards him
-
-                const delta = [P1.x - this.x, P1.y - this.y]
-                if (Math.sqrt(delta[0]**2 + delta[1]**2) > P1.radius + this.radius + fight_distance) {//it keeps automatily some distance from player
-                    moveThisTime = true
-
-                    var gained_velocity = this.movement.acceleration * delta_time
-                    
-                    if (gained_velocity > this.movement.max_speed[0] - this.movement.speed) {
-                        gained_velocity = this.movement.max_speed[0] - this.movement.speed
-                    }
-            
-
-                    const distance = this.movement.speed * delta_time + (gained_velocity * delta_time)/2
-                    this.movement.speed += gained_velocity
-                    const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance/*  * Math.sign(delta[1]) */] //TODO: this sign is the reason for the condition on next line
-                    /* if (P1.y < this.y) {
-                        change_in_position[1] = -change_in_position[1];
-                    } */
-                    this.x += change_in_position[0]
-                    this.y += change_in_position[1]
-                    
-                }
             }
         } else {
             // here will be function to look around
         } 
-        if (Math.abs(this.movement.speed) > 0 && moveThisTime == false) { //TODO: change the condition so it works for reverse too
+
+        //* MOVE part of enemy movement
+        if (this.playerSee) {
+            // it can see player so it chases him
+            const delta = [P1.x - this.x, P1.y - this.y]
+            if (Math.sqrt(delta[0]**2 + delta[1]**2) > P1.radius + this.radius + fight_distance + (this.movement.speed**2)/(2*Math.abs(this.movement.deacceleration))) {//it keeps automatily some distance from player
+                moveThisTime = true
+
+                var gained_velocity = this.movement.acceleration * delta_time
+                
+                if (gained_velocity > this.movement.max_speed[0] - this.movement.speed) {
+                    gained_velocity = this.movement.max_speed[0] - this.movement.speed
+                }
+        
+
+                const distance = this.movement.speed * delta_time + (gained_velocity * delta_time)/2
+                this.movement.speed += gained_velocity
+                const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance]
+                this.x += change_in_position[0]
+                this.y += change_in_position[1]
+                
+            }
+        
+        } else {
+            //here it will travel to random point in its territory
+        }
+
+        //* BREAK part of enemy movement
+        if (Math.abs(this.movement.speed) > 0 && moveThisTime == false) {
             console.log("breaking")
             var lost_velocity = this.movement.deacceleration * delta_time
             if (lost_velocity > this.movement.speed) {
@@ -196,10 +204,7 @@ class enemy {
             
             const distance = this.movement.speed * delta_time + (lost_velocity * delta_time)/2
             this.movement.speed += lost_velocity
-            const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance/*  * Math.sign(delta[1]) */] //TODO: this sign is the reason for the condition on next line
-            /* if (P1.y < this.y) {
-                change_in_position[1] = -change_in_position[1];
-            } */
+            const change_in_position = [Math.cos(this.angle) * distance, Math.sin(this.angle) * distance]
             this.x += change_in_position[0]
             this.y += change_in_position[1]
         }
