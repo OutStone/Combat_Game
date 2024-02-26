@@ -6,6 +6,8 @@ const Meters2pixel = 20
 
 class player {
     constructor(start_x, start_y){
+        this.hitbox = new Hitbox("circle",start_x,start_y,{radius:1})
+        
         this.x = start_x;
         this.y = start_y;
         this.angle = Math.PI/4; //in radeans
@@ -34,9 +36,46 @@ class Movement {
     
     }
 }
+class Hitbox {
+    constructor(type,x,y,other) {
+        this.type = type;
+        this.x = x;
+        this.y = y;
+
+        switch (this.type) {
+            case "rectangle":
+                this.width = other.width
+                this.height = other.height
+                break;
+            case "line":
+                this.endX = other.endX
+                this.endY = other.endY
+                break;
+            case "circle":
+                this.radius = other.radius
+                break;
+            case "semi_circle":
+                this.radius = other.radius
+                this.startAngle = other.startAngle
+                this.widthAngle = other.widthAngle
+                break;
+            default:
+                console.error("'" + this.type + "' is unknown type of ")
+        }
+    }
+}
+
+function collision(Obj_A,Obj_B) {//TODO: this func
+    if (Obj_A.type == "rectangle" && Obj_B.type == "rectangle") {
+
+    }
+} 
 //#################################################################-------ENEMY class------############################################
 class enemy {
     constructor(start_x, start_y){
+        this.hitbox = new Hitbox("circle",start_x,start_y,{radius:1})
+        this.view_hitbox = new Hitbox("semi_circle",start_x,start_y,{radius:1,startAngle:1.25*Math.PI,widthAngle:Math.PI/2})
+        
         this.x = start_x;
         this.y = start_y;
         this.angle = 1.5 * Math.PI; //in radeans
@@ -54,7 +93,7 @@ class enemy {
 
     look() {
         const delta = [P1.x - this.x, P1.y - this.y]
-        if (Math.sqrt(delta[0]**2 + delta[1]**2) < P1.radius + this.view.lenght) { //colision of two circles
+        if (Math.sqrt(delta[0]**2 + delta[1]**2) < P1.radius + this.view.lenght) { //collision of two circles
 
 
             var limits = [this.angle - (this.view.angle/2), this.angle + (this.view.angle/2)]

@@ -40,6 +40,8 @@ function spawn_enemy(x, y) {
 Hostile_NPC = []
 spawn_enemy(50, 115)
 P1 = new player(5, 5)
+console.log(Hostile_NPC)
+console.log(P1)
 
 
 var stop_game = false
